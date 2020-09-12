@@ -6,9 +6,19 @@ const { transport, mailTemplate } = require('../services/mail');
 
 const Mutations = {
   async createItem(parent, args, ctx, info) {
+    const { userId } = ctx.request;
+    if(!userId){
+      throw new Error("You must be logged in to do that")
+    }
+
     const item = await ctx.db.mutation.createItem(
       {
         data: {
+          user: {
+            connect: {
+              id: userId
+            }
+          },
           ...args
         }
       },
