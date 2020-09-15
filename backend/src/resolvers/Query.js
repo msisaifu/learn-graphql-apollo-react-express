@@ -1,4 +1,5 @@
 const { forwardTo } = require('prisma-binding');
+const { hasPermission } = require('../utils');
 
 const Query = {
   items: forwardTo('db'),
@@ -14,6 +15,15 @@ const Query = {
         where: { id: userId }
       },info
     )
+  },
+  async users(parent, args, ctx, info) {
+    const { userId, user } = ctx.request;
+    if (!userId) {
+      throw new Error("You must be logged in to do that")
+    }
+    hasPermission(user, ['ADMIN', 'PERMISSIONUPDATE']);
+
+    return ctx.db.query.users({}, info);
   }
 };
 
