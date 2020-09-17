@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import ItemStyles from './styles/ItemStyles';
 import Title from './styles/Title';
 import DeleteItem from './DeleteItem';
+import AddToCart from './AddToCart';
 import PriceTag from './styles/PriceTag';
 import formatMoney from '../lib/formatMoney';
 import Link from 'next/link';
@@ -36,7 +37,7 @@ export default class Item extends Component {
           }}>
             <a>Edit</a>
           </Link>
-          <button>Add To Cart</button>
+          <AddToCart id={item.id}/>
           <DeleteItem id={item.id}>Delete 12</DeleteItem>
         </div>
       </ItemStyles>
