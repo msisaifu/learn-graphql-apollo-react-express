@@ -59,7 +59,7 @@ const Mutations = {
     const ownsItem = item.user.id === ctx.request.userId;
     const hasPermissions = ctx.request.user.permissions.some(permission => ['ADMIN', 'ITEMDELETE'].includes(permission));
     
-    if(!ownsItem && hasPermission){
+    if (!ownsItem && hasPermissions){
       throw new Error("You don't have permission to do that!");
     }
     
