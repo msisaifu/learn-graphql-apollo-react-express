@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { randomBytes } = require('crypto');
 const { promisify } = require('util');
 const { transport, mailTemplate } = require('../services/mail');
+const { hasPermission } = require('../utils');
 
 const Mutations = {
   async createItem(parent, args, ctx, info) {
@@ -49,9 +50,19 @@ const Mutations = {
       `{
         id
         title
+        user {
+          id
+        }
       }
-      `);
-        
+    `);
+    
+    const ownsItem = item.user.id === ctx.request.userId;
+    const hasPermissions = ctx.request.user.permissions.some(permission => ['ADMIN', 'ITEMDELETE'].includes(permission));
+    
+    if(!ownsItem && hasPermission){
+      throw new Error("You don't have permission to do that!");
+    }
+    
     return ctx.db.mutation.deleteItem(
       {
         where
@@ -186,6 +197,35 @@ const Mutations = {
     });
 
     return res;
+  },
+  async updatePermissions(parent, args, ctx, info) {
+    const { userId } = ctx.request;
+    if (!userId) {
+      throw new Error("You must be logged in to do that")
+    }
+
+    const currentUser = await ctx.db.query.user(
+      {
+        where: {
+          id: userId
+        }
+      }, info
+    );
+
+    hasPermission(currentUser, ['ADMIN', 'PERMISSIONUPDATE']);
+
+    return ctx.db.mutation.updateUser(
+      {
+        data: {
+          permissions: {
+            set: args.permissions
+          }
+        },
+        where: {
+          id: args.userId
+        }
+      }, info
+    );
   }
   
 };
