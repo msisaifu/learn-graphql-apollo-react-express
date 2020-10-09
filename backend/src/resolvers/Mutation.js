@@ -233,8 +233,10 @@ const Mutations = {
       throw new Error("You must be logged in to do that")
     }
     const [existingCartItem] = await ctx.db.query.cartItems({
-      user: { id: userId },
-      item: { id: args.id },
+      where: {
+        user: { id: userId },
+        item: { id: args.id },
+      } 
     })
 
     if (existingCartItem) {
